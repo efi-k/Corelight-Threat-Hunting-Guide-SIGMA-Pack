@@ -1,0 +1,45 @@
+<form version="1.1">
+  <label>Corelight Threat Hunting Guide SIGMA Pack</label>
+  <description>A selection of Threat Hunting queries published by Corelight and SOC Prime</description>
+  <fieldset submitButton="false">
+    <input type="dropdown" token="selected_search">
+      <label>Select Threat Hunting query:</label>
+      <fieldForLabel>title</fieldForLabel>
+      <fieldForValue>title</fieldForValue>
+      <search>
+        <query>| rest /servicesNS/-/-/saved/searches 
+| fields title
+| search title=corelight_thg*
+| eval title=substr(title,15)</query>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </search>
+    </input>
+    <input type="time" token="time_range">
+      <label>Select time range:</label>
+      <default>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="text" token="selected_sensor">
+      <label>Sensor(s) name, comma delimited, or leave * for all</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <event>
+        <title>Results for query: $selected_search$, sensor(s): $selected_sensor$</title>
+        <search>
+          <query>| savedsearch "corelight_thg_$selected_search$" selected_sensor=$selected_sensor$</query>
+          <earliest>$time_range.earliest$</earliest>
+          <latest>$time_range.latest$</latest>
+        </search>
+        <option name="list.drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </event>
+    </panel>
+  </row>
+</form>
